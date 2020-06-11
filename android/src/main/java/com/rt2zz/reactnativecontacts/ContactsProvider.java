@@ -38,6 +38,7 @@ public class ContactsProvider {
         add(ContactsContract.Data.LOOKUP_KEY);
         add(ContactsContract.Contacts.Data.MIMETYPE);
         add(ContactsContract.Profile.DISPLAY_NAME);
+        add(ContactsContract.Profile.STARRED);
         add(Contactables.PHOTO_URI);
         add(StructuredName.DISPLAY_NAME);
         add(StructuredName.GIVEN_NAME);
@@ -229,7 +230,6 @@ public class ContactsProvider {
     public Integer getContactsCount() {
         Cursor cursor =  contentResolver.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
         int count = cursor.getCount();
-        
         return count;
     }
 
@@ -352,6 +352,8 @@ public class ContactsProvider {
                     contact.hasPhoto = true;
                 }
             }
+
+            contact.isStarred = cursor.getInt(cursor.getColumnIndex(ContactsContract.Profile.STARRED)) == 1;
 
             switch(mimeType) {
                 case StructuredName.CONTENT_ITEM_TYPE:
@@ -537,6 +539,7 @@ public class ContactsProvider {
         private String jobTitle = "";
         private String department = "";
         private String note ="";
+        private boolean isStarred =false;
         private List<Item> urls = new ArrayList<>();
         private boolean hasPhoto = false;
         private String photoUri;
@@ -566,6 +569,7 @@ public class ContactsProvider {
             contact.putString("note", note);
             contact.putBoolean("hasThumbnail", this.hasPhoto);
             contact.putString("thumbnailPath", photoUri == null ? "" : photoUri);
+            contact.putBoolean("isStarred", isStarred);
 
             WritableArray phoneNumbers = Arguments.createArray();
             for (Item item : phones) {
